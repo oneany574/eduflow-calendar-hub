@@ -13,6 +13,9 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -46,6 +49,20 @@ export default {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
+        },
+        eduflow: {
+          blue: "hsl(var(--eduflow-blue))",
+          "blue-light": "hsl(var(--eduflow-blue-light))",
+          "blue-dark": "hsl(var(--eduflow-blue-dark))",
+          purple: "hsl(var(--eduflow-purple))",
+          green: "hsl(var(--eduflow-green))",
+          "green-light": "hsl(var(--eduflow-green-light))",
+          orange: "hsl(var(--eduflow-orange))",
+          "orange-light": "hsl(var(--eduflow-orange-light))",
+          red: "hsl(var(--eduflow-red))",
+          "red-light": "hsl(var(--eduflow-red-light))",
+          gray: "hsl(var(--eduflow-gray))",
+          "gray-light": "hsl(var(--eduflow-gray-light))",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
