@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppLayout } from "@/components/Layout/AppLayout";
+import { SessionProvider } from "@/contexts/SessionContext";
 import Dashboard from "./pages/Dashboard";
 import Sessions from "./pages/Sessions";
 import Attendance from "./pages/Attendance";
@@ -14,21 +15,23 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route element={<AppLayout />}>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/sessions" element={<Sessions />} />
-            <Route path="/attendance" element={<Attendance />} />
-            <Route path="/classes" element={<Dashboard />} />
-            <Route path="/analytics" element={<Dashboard />} />
-            <Route path="/settings" element={<Dashboard />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <SessionProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route element={<AppLayout />}>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/sessions" element={<Sessions />} />
+              <Route path="/attendance" element={<Attendance />} />
+              <Route path="/classes" element={<Dashboard />} />
+              <Route path="/analytics" element={<Dashboard />} />
+              <Route path="/settings" element={<Dashboard />} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </SessionProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

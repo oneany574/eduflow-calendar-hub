@@ -5,11 +5,19 @@ import { MetricsSummary } from '@/components/Common/MetricsSummary';
 interface DailyViewProps {
   sessions: Session[];
   onViewDetails?: (session: Session) => void;
+  onStartSession?: (session: Session) => void;
+  onEndSession?: (session: Session) => void;
+  onTakeAttendance?: (session: Session) => void;
+  onReschedule?: (session: Session) => void;
+  onEdit?: (session: Session) => void;
+  onDelete?: (session: Session) => void;
 }
 
-export function DailyView({ sessions, onViewDetails }: DailyViewProps) {
+export function DailyView({ sessions, onViewDetails, onStartSession, onEndSession, onTakeAttendance, onReschedule, onEdit, onDelete }: DailyViewProps) {
   const morning = sessions.filter((s) => parseInt(s.startTime) < 12);
   const afternoon = sessions.filter((s) => parseInt(s.startTime) >= 12);
+
+  const cardProps = { onViewDetails, onStartSession, onEndSession, onTakeAttendance, onReschedule, onEdit, onDelete };
 
   const SectionLabel = ({ label }: { label: string }) => (
     <div className="flex items-center gap-3 my-4">
@@ -25,7 +33,7 @@ export function DailyView({ sessions, onViewDetails }: DailyViewProps) {
           <SectionLabel label="Morning" />
           <div className="space-y-3">
             {morning.map((s) => (
-              <SessionCard key={s.id} session={s} variant="full" onViewDetails={onViewDetails} />
+              <SessionCard key={s.id} session={s} variant="full" {...cardProps} />
             ))}
           </div>
         </>
@@ -35,7 +43,7 @@ export function DailyView({ sessions, onViewDetails }: DailyViewProps) {
           <SectionLabel label="Afternoon" />
           <div className="space-y-3">
             {afternoon.map((s) => (
-              <SessionCard key={s.id} session={s} variant="full" onViewDetails={onViewDetails} />
+              <SessionCard key={s.id} session={s} variant="full" {...cardProps} />
             ))}
           </div>
         </>

@@ -1,12 +1,19 @@
 import { Session } from '@/types/session';
 import { StatusBadge } from '@/components/Common/StatusBadge';
-import { AlertTriangle, Clock, FileText, MoreVertical, Play, Users, UserCheck, CalendarClock, MapPin } from 'lucide-react';
+import { AlertTriangle, Clock, FileText, MoreVertical, Play, Users, UserCheck, CalendarClock, MapPin, Pencil, Trash2, StopCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 interface SessionCardProps {
   session: Session;
   variant?: 'full' | 'compact' | 'agenda';
   onViewDetails?: (session: Session) => void;
+  onStartSession?: (session: Session) => void;
+  onEndSession?: (session: Session) => void;
+  onTakeAttendance?: (session: Session) => void;
+  onReschedule?: (session: Session) => void;
+  onEdit?: (session: Session) => void;
+  onDelete?: (session: Session) => void;
 }
 
 const borderColors: Record<string, string> = {
@@ -18,7 +25,7 @@ const borderColors: Record<string, string> = {
   cancelled: 'border-l-muted-foreground',
 };
 
-export function SessionCard({ session, variant = 'full', onViewDetails }: SessionCardProps) {
+export function SessionCard({ session, variant = 'full', onViewDetails, onStartSession, onEndSession, onTakeAttendance, onReschedule, onEdit, onDelete }: SessionCardProps) {
   const formatTime = (t: string) => {
     const [h, m] = t.split(':').map(Number);
     const ampm = h >= 12 ? 'PM' : 'AM';
@@ -26,28 +33,66 @@ export function SessionCard({ session, variant = 'full', onViewDetails }: Sessio
     return `${hour.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')} ${ampm}`;
   };
 
+  const MoreMenu = () => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className="text-muted-foreground h-8 w-8">
+          <MoreVertical className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={() => onViewDetails?.(session)}>
+          <FileText className="h-4 w-4 mr-2" /> View Details
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onEdit?.(session)}>
+          <Pencil className="h-4 w-4 mr-2" /> Edit Session
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onReschedule?.(session)}>
+          <CalendarClock className="h-4 w-4 mr-2" /> Reschedule
+        </DropdownMenuItem>
+        {session.status === 'in-progress' && (
+          <DropdownMenuItem onClick={() => onEndSession?.(session)}>
+            <StopCircle className="h-4 w-4 mr-2" /> End Session
+          </DropdownMenuItem>
+        )}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => onDelete?.(session)} className="text-destructive focus:text-destructive">
+          <Trash2 className="h-4 w-4 mr-2" /> Delete Session
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+
   if (variant === 'compact') {
     return (
       <div className={`rounded-lg bg-card border border-border p-4 border-l-4 ${borderColors[session.status]}`}>
         <div className="flex items-start justify-between mb-1">
           <StatusBadge status={session.status} />
-          <span className="text-xs text-muted-foreground">{formatTime(session.startTime)} - {formatTime(session.endTime)}</span>
+          <div className="flex items-center gap-1">
+            <span className="text-xs text-muted-foreground">{formatTime(session.startTime)} - {formatTime(session.endTime)}</span>
+            <MoreMenu />
+          </div>
         </div>
         <h4 className="font-semibold text-foreground mt-2">{session.title}</h4>
         <p className="text-sm text-muted-foreground">{session.section} • {session.room}</p>
         {session.status === 'in-progress' && (
-          <Button size="sm" className="w-full mt-3 bg-primary text-primary-foreground hover:bg-primary/90">
+          <Button size="sm" className="w-full mt-3 bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => onTakeAttendance?.(session)}>
             <UserCheck className="h-4 w-4 mr-1.5" /> Take Attendance
           </Button>
         )}
         {session.status === 'scheduled' && (
-          <Button size="sm" className="w-full mt-3 bg-primary text-primary-foreground hover:bg-primary/90">
+          <Button size="sm" className="w-full mt-3 bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => onStartSession?.(session)}>
             <Play className="h-4 w-4 mr-1.5" /> Start Session
           </Button>
         )}
         {(session.status === 'upcoming' || session.status === 'completed') && (
           <Button size="sm" variant="outline" className="w-full mt-3" onClick={() => onViewDetails?.(session)}>
             View Details
+          </Button>
+        )}
+        {session.status === 'conflict' && (
+          <Button size="sm" variant="outline" className="w-full mt-3" onClick={() => onReschedule?.(session)}>
+            <CalendarClock className="h-4 w-4 mr-1.5" /> Reschedule
           </Button>
         )}
       </div>
@@ -113,28 +158,26 @@ export function SessionCard({ session, variant = 'full', onViewDetails }: Sessio
         </div>
         <div className="flex items-center gap-2">
           {session.status === 'in-progress' && (
-            <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => onTakeAttendance?.(session)}>
               <UserCheck className="h-4 w-4 mr-1.5" /> Take Attendance
             </Button>
           )}
           {session.status === 'scheduled' && (
-            <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => onStartSession?.(session)}>
               <Play className="h-4 w-4 mr-1.5" /> Start Session
             </Button>
           )}
           {session.status === 'conflict' && (
-            <Button variant="outline">
+            <Button variant="outline" onClick={() => onReschedule?.(session)}>
               <CalendarClock className="h-4 w-4 mr-1.5" /> Reschedule
             </Button>
           )}
           {session.status === 'upcoming' && (
-            <Button variant="outline">
+            <Button variant="outline" onClick={() => onStartSession?.(session)}>
               <CalendarClock className="h-4 w-4 mr-1.5" /> Start Session
             </Button>
           )}
-          <Button variant="ghost" size="icon" className="text-muted-foreground">
-            <MoreVertical className="h-4 w-4" />
-          </Button>
+          <MoreMenu />
         </div>
       </div>
     </div>
