@@ -46,11 +46,11 @@ export function FilterBar({ filters, onChange, variant = 'instructor' }: FilterB
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="in-progress">In Progress</SelectItem>
               <SelectItem value="scheduled">Scheduled</SelectItem>
+              <SelectItem value="in-progress">In Progress</SelectItem>
               <SelectItem value="completed">Completed</SelectItem>
-              <SelectItem value="conflict">Conflict</SelectItem>
-              <SelectItem value="upcoming">Upcoming</SelectItem>
+              <SelectItem value="cancelled">Cancelled</SelectItem>
+              <SelectItem value="rescheduled">Rescheduled</SelectItem>
             </SelectContent>
           </Select>
         </>
@@ -74,9 +74,11 @@ export function FilterBar({ filters, onChange, variant = 'instructor' }: FilterB
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Status: Any</SelectItem>
-              <SelectItem value="in-progress">In Progress</SelectItem>
               <SelectItem value="scheduled">Scheduled</SelectItem>
+              <SelectItem value="in-progress">In Progress</SelectItem>
               <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="cancelled">Cancelled</SelectItem>
+              <SelectItem value="rescheduled">Rescheduled</SelectItem>
             </SelectContent>
           </Select>
         </>

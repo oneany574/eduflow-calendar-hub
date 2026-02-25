@@ -3,7 +3,8 @@ export function CalendarLegend() {
     { label: 'Scheduled', className: 'dot-scheduled' },
     { label: 'In Progress', className: 'dot-in-progress' },
     { label: 'Completed', className: 'dot-completed' },
-    { label: 'Conflict', className: 'dot-conflict' },
+    { label: 'Cancelled', className: 'dot-cancelled' },
+    { label: 'Rescheduled', className: 'dot-rescheduled' },
   ];
 
   return (

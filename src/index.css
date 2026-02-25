@@ -51,16 +51,16 @@
     --eduflow-gray-light: 215 20% 95%;
 
     /* Status colors */
-    --status-in-progress: 270 67% 55%;
-    --status-in-progress-bg: 270 67% 96%;
     --status-scheduled: 213 94% 52%;
     --status-scheduled-bg: 213 94% 96%;
+    --status-in-progress: 270 67% 55%;
+    --status-in-progress-bg: 270 67% 96%;
     --status-completed: 152 60% 45%;
     --status-completed-bg: 152 60% 94%;
-    --status-conflict: 32 95% 55%;
-    --status-conflict-bg: 38 100% 95%;
-    --status-upcoming: 215 16% 47%;
-    --status-upcoming-bg: 215 20% 95%;
+    --status-cancelled: 0 84% 60%;
+    --status-cancelled-bg: 0 84% 95%;
+    --status-rescheduled: 32 95% 55%;
+    --status-rescheduled-bg: 38 100% 95%;
 
     /* Attendance */
     --attendance-present: 152 60% 45%;
@@ -95,20 +95,20 @@
 }
 
 @layer utilities {
-  .status-in-progress {
-    @apply text-[hsl(var(--status-in-progress))] bg-[hsl(var(--status-in-progress-bg))];
-  }
   .status-scheduled {
     @apply text-[hsl(var(--status-scheduled))] bg-[hsl(var(--status-scheduled-bg))];
+  }
+  .status-in-progress {
+    @apply text-[hsl(var(--status-in-progress))] bg-[hsl(var(--status-in-progress-bg))];
   }
   .status-completed {
     @apply text-[hsl(var(--status-completed))] bg-[hsl(var(--status-completed-bg))];
   }
-  .status-conflict {
-    @apply text-[hsl(var(--status-conflict))] bg-[hsl(var(--status-conflict-bg))];
+  .status-cancelled {
+    @apply text-[hsl(var(--status-cancelled))] bg-[hsl(var(--status-cancelled-bg))];
   }
-  .status-upcoming {
-    @apply text-[hsl(var(--status-upcoming))] bg-[hsl(var(--status-upcoming-bg))];
+  .status-rescheduled {
+    @apply text-[hsl(var(--status-rescheduled))] bg-[hsl(var(--status-rescheduled-bg))];
   }
   .dot-scheduled {
     @apply bg-[hsl(var(--status-scheduled))];
@@ -119,8 +119,11 @@
   .dot-completed {
     @apply bg-[hsl(var(--status-completed))];
   }
-  .dot-conflict {
-    @apply bg-[hsl(var(--status-conflict))];
+  .dot-cancelled {
+    @apply bg-[hsl(var(--status-cancelled))];
+  }
+  .dot-rescheduled {
+    @apply bg-[hsl(var(--status-rescheduled))];
   }
 
   .attendance-present {

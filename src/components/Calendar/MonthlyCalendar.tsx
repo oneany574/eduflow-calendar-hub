@@ -11,12 +11,11 @@ interface MonthlyCalendarProps {
 }
 
 const dotClass: Record<string, string> = {
-  'in-progress': 'dot-in-progress',
   scheduled: 'dot-scheduled',
+  'in-progress': 'dot-in-progress',
   completed: 'dot-completed',
-  conflict: 'dot-conflict',
-  upcoming: 'dot-scheduled',
-  cancelled: 'dot-scheduled',
+  cancelled: 'dot-cancelled',
+  rescheduled: 'dot-rescheduled',
 };
 
 const WEEKDAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];

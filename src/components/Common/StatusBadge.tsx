@@ -1,12 +1,11 @@
 import { SessionStatus } from '@/types/session';
 
 const statusConfig: Record<SessionStatus, { label: string; className: string }> = {
-  'in-progress': { label: 'IN PROGRESS', className: 'status-in-progress' },
   scheduled: { label: 'SCHEDULED', className: 'status-scheduled' },
+  'in-progress': { label: 'IN PROGRESS', className: 'status-in-progress' },
   completed: { label: 'COMPLETED', className: 'status-completed' },
-  conflict: { label: 'CONFLICT', className: 'status-conflict' },
-  upcoming: { label: 'UPCOMING', className: 'status-upcoming' },
-  cancelled: { label: 'CANCELLED', className: 'status-upcoming' },
+  cancelled: { label: 'CANCELLED', className: 'status-cancelled' },
+  rescheduled: { label: 'RESCHEDULED', className: 'status-rescheduled' },
 };
 
 export function StatusBadge({ status }: { status: SessionStatus }) {
