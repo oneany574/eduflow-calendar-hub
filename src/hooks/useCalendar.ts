@@ -1,10 +1,11 @@
 import { useState, useMemo } from 'react';
 import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, addMonths, subMonths, addWeeks, subWeeks, addDays, subDays, format, isSameDay, isSameMonth, isToday } from 'date-fns';
 import { CalendarView, FilterState, Session } from '@/types/session';
-import { mockSessions } from '@/data/mockSessions';
+import { useSessionContext } from '@/contexts/SessionContext';
 
 export function useCalendar() {
-  const [currentDate, setCurrentDate] = useState(new Date(2024, 9, 23)); // Oct 23, 2024
+  const { sessions } = useSessionContext();
+  const [currentDate, setCurrentDate] = useState(new Date(2024, 9, 23));
   const [selectedDate, setSelectedDate] = useState(new Date(2024, 9, 23));
   const [view, setView] = useState<CalendarView>('monthly');
   const [filters, setFilters] = useState<FilterState>({
@@ -16,7 +17,7 @@ export function useCalendar() {
   });
 
   const filteredSessions = useMemo(() => {
-    return mockSessions.filter((s) => {
+    return sessions.filter((s) => {
       if (filters.sectionFilter !== 'all' && s.section !== filters.sectionFilter) return false;
       if (filters.statusFilter !== 'all' && s.status !== filters.statusFilter) return false;
       if (filters.moduleFilter !== 'all' && s.module !== filters.moduleFilter) return false;
@@ -25,7 +26,7 @@ export function useCalendar() {
           !s.topic.toLowerCase().includes(filters.search.toLowerCase())) return false;
       return true;
     });
-  }, [filters]);
+  }, [filters, sessions]);
 
   const monthDays = useMemo(() => {
     const monthStart = startOfMonth(currentDate);
@@ -60,7 +61,7 @@ export function useCalendar() {
   };
 
   const goToToday = () => {
-    const today = new Date(2024, 9, 23); // Mock "today"
+    const today = new Date(2024, 9, 23);
     setCurrentDate(today);
     setSelectedDate(today);
   };

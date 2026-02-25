@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
 import { useCalendar } from '@/hooks/useCalendar';
+import { useSessionContext } from '@/contexts/SessionContext';
 import { MonthlyCalendar } from '@/components/Calendar/MonthlyCalendar';
 import { WeeklyView } from '@/components/Calendar/WeeklyView';
 import { DailyView } from '@/components/Calendar/DailyView';
@@ -10,6 +11,10 @@ import { ConflictAlert } from '@/components/Common/ConflictAlert';
 import { DayPreview } from '@/components/Sidebar/DayPreview';
 import { TodaysAgenda } from '@/components/Sidebar/TodaysAgenda';
 import { SessionDetailsSheet } from '@/components/Session/SessionDetailsSheet';
+import { SessionFormDialog } from '@/components/Session/SessionFormDialog';
+import { TakeAttendanceDialog } from '@/components/Session/TakeAttendanceDialog';
+import { RescheduleDialog } from '@/components/Session/RescheduleDialog';
+import { DeleteSessionDialog } from '@/components/Session/DeleteSessionDialog';
 import { Session, CalendarView } from '@/types/session';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
@@ -18,9 +23,31 @@ import { useOutletContext } from 'react-router-dom';
 export default function SessionsPage() {
   const { role } = useOutletContext<{ role: string }>();
   const cal = useCalendar();
+  const { startSession, endSession } = useSessionContext();
+
   const [detailSession, setDetailSession] = useState<Session | null>(null);
+  const [formOpen, setFormOpen] = useState(false);
+  const [editSession, setEditSession] = useState<Session | null>(null);
+  const [attendanceSession, setAttendanceSession] = useState<Session | null>(null);
+  const [rescheduleSession, setRescheduleSession] = useState<Session | null>(null);
+  const [deleteSession, setDeleteSession] = useState<Session | null>(null);
 
   const isInstructor = role === 'instructor' || role === 'admin';
+
+  const handleStartSession = (s: Session) => startSession(s.id);
+  const handleEndSession = (s: Session) => endSession(s.id);
+  const handleEdit = (s: Session) => { setEditSession(s); setFormOpen(true); };
+  const handleNewSession = () => { setEditSession(null); setFormOpen(true); };
+
+  const actionProps = {
+    onViewDetails: setDetailSession,
+    onStartSession: handleStartSession,
+    onEndSession: handleEndSession,
+    onTakeAttendance: setAttendanceSession,
+    onReschedule: setRescheduleSession,
+    onEdit: handleEdit,
+    onDelete: setDeleteSession,
+  };
 
   const ViewToggle = () => (
     <div className="flex rounded-lg border border-border overflow-hidden">
@@ -40,7 +67,6 @@ export default function SessionsPage() {
 
   return (
     <div>
-      {/* Conflict banner */}
       <div className="mb-4">
         <ConflictAlert
           message="Session Conflict Detected"
@@ -48,33 +74,20 @@ export default function SessionsPage() {
         />
       </div>
 
-      {/* Page header */}
       <div className="flex items-center justify-between mb-5">
         <h1 className="text-2xl font-bold text-foreground">
           {isInstructor ? 'Instructor Sessions Calendar' : 'Sessions Calendar'}
         </h1>
         <div className="flex items-center gap-3">
           <ViewToggle />
-          {isInstructor && (
-            <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
-              <Plus className="h-4 w-4 mr-1.5" /> New Session
-            </Button>
-          )}
-          {!isInstructor && (
-            <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
-              <Plus className="h-4 w-4 mr-1.5" /> Book Session
-            </Button>
-          )}
+          <Button className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={handleNewSession}>
+            <Plus className="h-4 w-4 mr-1.5" /> {isInstructor ? 'New Session' : 'Book Session'}
+          </Button>
         </div>
       </div>
 
-      {/* Filters + navigation */}
       <div className="flex items-center justify-between mb-5">
-        <FilterBar
-          filters={cal.filters}
-          onChange={cal.setFilters}
-          variant={isInstructor ? 'instructor' : 'student'}
-        />
+        <FilterBar filters={cal.filters} onChange={cal.setFilters} variant={isInstructor ? 'instructor' : 'student'} />
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={cal.goToToday}>Today</Button>
           <Button variant="ghost" size="icon" onClick={() => cal.navigate('prev')}>
@@ -86,11 +99,8 @@ export default function SessionsPage() {
         </div>
       </div>
 
-      {/* Main content area */}
       <div className="flex gap-6">
-        {/* Calendar area */}
         <div className="flex-1 min-w-0">
-          {/* Month/week label */}
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-xl font-semibold text-foreground">
               {format(cal.currentDate, cal.view === 'daily' ? 'EEEE, MMMM d, yyyy' : 'MMMM yyyy')}
@@ -120,44 +130,34 @@ export default function SessionsPage() {
                 isSelected={cal.isSelected}
                 onSelectDate={cal.setSelectedDate}
               />
-              {/* Show daily view below the week strip */}
               <div className="mt-6">
-                <DailyView sessions={cal.selectedDateSessions} onViewDetails={setDetailSession} />
+                <DailyView sessions={cal.selectedDateSessions} {...actionProps} />
               </div>
             </>
           )}
 
           {cal.view === 'daily' && (
-            <DailyView sessions={cal.selectedDateSessions} onViewDetails={setDetailSession} />
+            <DailyView sessions={cal.selectedDateSessions} {...actionProps} />
           )}
         </div>
 
-        {/* Side panel - only in monthly view */}
         {cal.view === 'monthly' && (
           <div className="w-[340px] shrink-0">
             {isInstructor ? (
-              <DayPreview
-                date={cal.selectedDate}
-                sessions={cal.selectedDateSessions}
-                onViewDetails={setDetailSession}
-              />
+              <DayPreview date={cal.selectedDate} sessions={cal.selectedDateSessions} {...actionProps} />
             ) : (
-              <TodaysAgenda
-                date={cal.selectedDate}
-                sessions={cal.selectedDateSessions}
-                onViewDetails={setDetailSession}
-              />
+              <TodaysAgenda date={cal.selectedDate} sessions={cal.selectedDateSessions} onViewDetails={setDetailSession} />
             )}
           </div>
         )}
       </div>
 
-      {/* Session details sheet */}
-      <SessionDetailsSheet
-        session={detailSession}
-        open={!!detailSession}
-        onClose={() => setDetailSession(null)}
-      />
+      {/* Dialogs */}
+      <SessionDetailsSheet session={detailSession} open={!!detailSession} onClose={() => setDetailSession(null)} />
+      <SessionFormDialog open={formOpen} onClose={() => { setFormOpen(false); setEditSession(null); }} session={editSession} />
+      <TakeAttendanceDialog open={!!attendanceSession} onClose={() => setAttendanceSession(null)} session={attendanceSession} />
+      <RescheduleDialog open={!!rescheduleSession} onClose={() => setRescheduleSession(null)} session={rescheduleSession} />
+      <DeleteSessionDialog open={!!deleteSession} onClose={() => setDeleteSession(null)} session={deleteSession} />
     </div>
   );
 }
