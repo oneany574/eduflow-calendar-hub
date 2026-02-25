@@ -17,12 +17,11 @@ interface SessionCardProps {
 }
 
 const borderColors: Record<string, string> = {
-  'in-progress': 'border-l-eduflow-purple',
   scheduled: 'border-l-primary',
+  'in-progress': 'border-l-eduflow-purple',
   completed: 'border-l-eduflow-green',
-  conflict: 'border-l-eduflow-orange',
-  upcoming: 'border-l-eduflow-gray',
-  cancelled: 'border-l-muted-foreground',
+  cancelled: 'border-l-destructive',
+  rescheduled: 'border-l-eduflow-orange',
 };
 
 export function SessionCard({ session, variant = 'full', onViewDetails, onStartSession, onEndSession, onTakeAttendance, onReschedule, onEdit, onDelete }: SessionCardProps) {
@@ -44,12 +43,16 @@ export function SessionCard({ session, variant = 'full', onViewDetails, onStartS
         <DropdownMenuItem onClick={() => onViewDetails?.(session)}>
           <FileText className="h-4 w-4 mr-2" /> View Details
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => onEdit?.(session)}>
-          <Pencil className="h-4 w-4 mr-2" /> Edit Session
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => onReschedule?.(session)}>
-          <CalendarClock className="h-4 w-4 mr-2" /> Reschedule
-        </DropdownMenuItem>
+        {session.status !== 'cancelled' && session.status !== 'completed' && (
+          <DropdownMenuItem onClick={() => onEdit?.(session)}>
+            <Pencil className="h-4 w-4 mr-2" /> Edit Session
+          </DropdownMenuItem>
+        )}
+        {session.status !== 'cancelled' && session.status !== 'completed' && (
+          <DropdownMenuItem onClick={() => onReschedule?.(session)}>
+            <CalendarClock className="h-4 w-4 mr-2" /> Reschedule
+          </DropdownMenuItem>
+        )}
         {session.status === 'in-progress' && (
           <DropdownMenuItem onClick={() => onEndSession?.(session)}>
             <StopCircle className="h-4 w-4 mr-2" /> End Session
@@ -65,7 +68,7 @@ export function SessionCard({ session, variant = 'full', onViewDetails, onStartS
 
   if (variant === 'compact') {
     return (
-      <div className={`rounded-lg bg-card border border-border p-4 border-l-4 ${borderColors[session.status]}`}>
+      <div className={`rounded-lg bg-card border border-border p-4 border-l-4 ${borderColors[session.status] || 'border-l-muted-foreground'}`}>
         <div className="flex items-start justify-between mb-1">
           <StatusBadge status={session.status} />
           <div className="flex items-center gap-1">
@@ -85,12 +88,17 @@ export function SessionCard({ session, variant = 'full', onViewDetails, onStartS
             <Play className="h-4 w-4 mr-1.5" /> Start Session
           </Button>
         )}
-        {(session.status === 'upcoming' || session.status === 'completed') && (
+        {session.status === 'rescheduled' && (
+          <Button size="sm" className="w-full mt-3 bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => onStartSession?.(session)}>
+            <Play className="h-4 w-4 mr-1.5" /> Start Session
+          </Button>
+        )}
+        {session.status === 'completed' && (
           <Button size="sm" variant="outline" className="w-full mt-3" onClick={() => onViewDetails?.(session)}>
             View Details
           </Button>
         )}
-        {session.status === 'conflict' && (
+        {session.status === 'cancelled' && (
           <Button size="sm" variant="outline" className="w-full mt-3" onClick={() => onReschedule?.(session)}>
             <CalendarClock className="h-4 w-4 mr-1.5" /> Reschedule
           </Button>
@@ -101,7 +109,7 @@ export function SessionCard({ session, variant = 'full', onViewDetails, onStartS
 
   if (variant === 'agenda') {
     return (
-      <div className={`rounded-lg bg-card border border-border p-4 border-l-4 ${borderColors[session.status]} cursor-pointer hover:shadow-sm transition-shadow`} onClick={() => onViewDetails?.(session)}>
+      <div className={`rounded-lg bg-card border border-border p-4 border-l-4 ${borderColors[session.status] || 'border-l-muted-foreground'} cursor-pointer hover:shadow-sm transition-shadow`} onClick={() => onViewDetails?.(session)}>
         <div className="flex items-start justify-between mb-1">
           <StatusBadge status={session.status} />
           <span className="text-xs text-muted-foreground flex items-center gap-1">
@@ -128,10 +136,7 @@ export function SessionCard({ session, variant = 'full', onViewDetails, onStartS
 
   // Full variant (daily view)
   return (
-    <div className={`rounded-xl bg-card border border-border p-5 border-l-4 ${borderColors[session.status]} relative`}>
-      {session.status === 'conflict' && (
-        <AlertTriangle className="absolute top-4 right-4 h-5 w-5 text-eduflow-orange" />
-      )}
+    <div className={`rounded-xl bg-card border border-border p-5 border-l-4 ${borderColors[session.status] || 'border-l-muted-foreground'} relative`}>
       <div className="flex items-start justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-3">
@@ -162,19 +167,14 @@ export function SessionCard({ session, variant = 'full', onViewDetails, onStartS
               <UserCheck className="h-4 w-4 mr-1.5" /> Take Attendance
             </Button>
           )}
-          {session.status === 'scheduled' && (
+          {(session.status === 'scheduled' || session.status === 'rescheduled') && (
             <Button className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => onStartSession?.(session)}>
               <Play className="h-4 w-4 mr-1.5" /> Start Session
             </Button>
           )}
-          {session.status === 'conflict' && (
+          {session.status === 'cancelled' && (
             <Button variant="outline" onClick={() => onReschedule?.(session)}>
               <CalendarClock className="h-4 w-4 mr-1.5" /> Reschedule
-            </Button>
-          )}
-          {session.status === 'upcoming' && (
-            <Button variant="outline" onClick={() => onStartSession?.(session)}>
-              <CalendarClock className="h-4 w-4 mr-1.5" /> Start Session
             </Button>
           )}
           <MoreMenu />

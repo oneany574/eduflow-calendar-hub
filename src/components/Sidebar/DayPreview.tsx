@@ -16,7 +16,7 @@ interface DayPreviewProps {
 }
 
 export function DayPreview({ date, sessions, onViewDetails, onStartSession, onEndSession, onTakeAttendance, onReschedule, onEdit, onDelete }: DayPreviewProps) {
-  const hasConflicts = sessions.some((s) => s.status === 'conflict');
+  const hasConflicts = sessions.some((s) => s.status === 'rescheduled');
   const cardProps = { onViewDetails, onStartSession, onEndSession, onTakeAttendance, onReschedule, onEdit, onDelete };
 
   return (

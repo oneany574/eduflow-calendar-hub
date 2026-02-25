@@ -75,7 +75,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
   const rescheduleSession = useCallback((id: string, newDate: string, newStartTime: string, newEndTime: string) => {
     setSessions(prev => prev.map(s =>
-      s.id === id ? { ...s, date: newDate, startTime: newStartTime, endTime: newEndTime, status: 'scheduled' as SessionStatus, conflictWith: undefined } : s
+      s.id === id ? { ...s, date: newDate, startTime: newStartTime, endTime: newEndTime, status: 'rescheduled' as SessionStatus, conflictWith: undefined } : s
     ));
     toast({ title: 'Session Rescheduled', description: 'The session has been moved to the new date/time.' });
   }, []);

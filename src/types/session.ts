@@ -1,4 +1,4 @@
-export type SessionStatus = 'in-progress' | 'scheduled' | 'completed' | 'conflict' | 'upcoming' | 'cancelled';
+export type SessionStatus = 'scheduled' | 'in-progress' | 'completed' | 'cancelled' | 'rescheduled';
 export type CalendarView = 'monthly' | 'weekly' | 'daily';
 export type UserRole = 'instructor' | 'student' | 'admin';
 export type AttendanceStatus = 'present' | 'absent' | 'late' | 'excused';
