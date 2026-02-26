@@ -1,10 +1,11 @@
 import { useState, useMemo } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, isSameMonth } from 'date-fns';
 import { mockAttendance } from '@/data/mockSessions';
-import { AttendanceStatus } from '@/types/session';
+import { AttendanceStatus, AttendanceRecord } from '@/types/session';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AttendanceDetailDialog } from './AttendanceDetailDialog';
 
 const WEEKDAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
@@ -18,6 +19,8 @@ const statusStyle: Record<AttendanceStatus, { letter: string; className: string 
 export function AttendanceCalendar() {
   const [currentDate, setCurrentDate] = useState(new Date(2024, 9, 1));
   const [statusFilter, setStatusFilter] = useState('all');
+  const [selectedDay, setSelectedDay] = useState<Date | null>(null);
+  const [selectedRecord, setSelectedRecord] = useState<AttendanceRecord | null>(null);
   const todayMock = new Date(2024, 9, 10);
 
   const days = useMemo(() => {
@@ -119,9 +122,17 @@ export function AttendanceCalendar() {
             return (
               <div
                 key={i}
+                onClick={() => {
+                  if (inMonth) {
+                    const rec = mockAttendance.find(a => a.date === dateStr) || null;
+                    setSelectedDay(day);
+                    setSelectedRecord(rec);
+                  }
+                }}
                 className={`
-                  min-h-[100px] p-2 border-b border-r border-border relative
-                  ${!inMonth ? 'opacity-30' : ''}
+                  min-h-[100px] p-2 border-b border-r border-border relative cursor-pointer
+                  hover:bg-secondary/50 transition-colors
+                  ${!inMonth ? 'opacity-30 cursor-default' : ''}
                   ${today ? 'bg-secondary ring-2 ring-primary ring-inset' : ''}
                 `}
               >
@@ -157,6 +168,13 @@ export function AttendanceCalendar() {
           </div>
         ))}
       </div>
+
+      <AttendanceDetailDialog
+        open={!!selectedDay}
+        onClose={() => { setSelectedDay(null); setSelectedRecord(null); }}
+        date={selectedDay}
+        record={selectedRecord}
+      />
     </div>
   );
 }
