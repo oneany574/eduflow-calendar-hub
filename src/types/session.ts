@@ -26,6 +26,14 @@ export interface AttendanceRecord {
   date: string;
   status: AttendanceStatus;
   sessionId: string;
+  checkInTime?: string;
+  checkOutTime?: string;
+  lateTime?: string;
+  excuseNotes?: string;
+  halfLeaveNotes?: string;
+  sessionTitle?: string;
+  instructor?: string;
+  room?: string;
 }
 
 export interface FilterState {
