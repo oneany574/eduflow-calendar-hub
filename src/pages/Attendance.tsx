@@ -1,4 +1,5 @@
 import { AttendanceCalendar } from '@/components/Attendance/AttendanceCalendar';
+import { AttendancePieChart } from '@/components/Attendance/AttendancePieChart';
 
 export default function AttendancePage() {
   return (
@@ -12,7 +13,14 @@ export default function AttendancePage() {
         <span className="mx-1">›</span>
         <span className="text-foreground font-medium">Attendance</span>
       </nav>
-      <AttendanceCalendar />
+      <div className="flex gap-6 items-start">
+        <div className="flex-1 min-w-0">
+          <AttendanceCalendar />
+        </div>
+        <div className="w-[280px] shrink-0">
+          <AttendancePieChart />
+        </div>
+      </div>
     </div>
   );
 }
