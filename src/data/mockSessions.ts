@@ -93,7 +93,7 @@ export const mockSessions: Session[] = [
   {
     id: '6',
     title: 'Advanced Calculus: Integration by Parts',
-    description: 'This session covers complex integration techniques, focusing on the derivation and application of integration by parts for transcendental functions.',
+    description: 'This session covers complex integration techniques.',
     status: 'in-progress',
     date: '2024-10-04',
     startTime: '10:00',
@@ -129,7 +129,7 @@ export const mockSessions: Session[] = [
   {
     id: '8',
     title: 'Quantum Mechanics: Schrödinger Equation',
-    description: 'Introduction to the Schrödinger equation and its applications in quantum mechanics.',
+    description: 'Introduction to the Schrödinger equation.',
     status: 'scheduled',
     date: '2024-10-04',
     startTime: '16:00',
@@ -142,7 +142,6 @@ export const mockSessions: Session[] = [
     module: 'Physics',
     level: 'Advanced',
   },
-  // Additional sessions for other dates
   {
     id: '9',
     title: 'Data Structures & Algorithms',
@@ -210,31 +209,102 @@ export const mockSessions: Session[] = [
   },
 ];
 
+function makeAttendance(
+  id: string,
+  status: 'present' | 'absent' | 'late' | 'excused',
+  sessionDate: string,
+  startTime: string,
+  endTime: string,
+  topic: string,
+  roomName: string,
+  roomNumber: string,
+  building: string,
+  opts: {
+    checkInTime?: string;
+    checkOutTime?: string;
+    minutesLate?: number;
+    isExcused?: boolean;
+    excuseReason?: string | null;
+    notes?: string | null;
+  } = {}
+): AttendanceRecord {
+  const checkIn = opts.checkInTime ? `${sessionDate}T${opts.checkInTime}:00.000Z` : null;
+  const checkOut = opts.checkOutTime ? `${sessionDate}T${opts.checkOutTime}:00.000Z` : null;
+  return {
+    id,
+    status,
+    checkInTime: checkIn,
+    checkOutTime: checkOut,
+    minutesLate: opts.minutesLate ?? 0,
+    isExcused: opts.isExcused ?? false,
+    excuseReason: opts.excuseReason ?? null,
+    excuseProof: null,
+    notes: opts.notes ?? null,
+    createdAt: `${sessionDate}T${startTime}:00.000Z`,
+    updatedAt: `${sessionDate}T${endTime}:00.000Z`,
+    classSession: {
+      id: `cs-${id}`,
+      sessionDate: `${sessionDate}T${startTime}:00.000Z`,
+      startTime,
+      endTime,
+      status: 'COMPLETED',
+      topic,
+      description: `Session covering ${topic}.`,
+      classroom: {
+        id: `cr-${id}`,
+        name: roomName,
+        roomNumber,
+        building,
+      },
+      classSchedule: {
+        id: `sch-${id}`,
+        scheduleType: 'LECTURE',
+        dayOfWeek: new Date(sessionDate).getDay(),
+        startTime,
+        endTime,
+      },
+    },
+    sessionAttendanceOverview: {
+      id: `sao-${id}`,
+      status: 'COMPLETED',
+      totalStudents: 30,
+      presentCount: status === 'present' ? 28 : 27,
+      absentCount: status === 'absent' ? 2 : 1,
+      lateCount: status === 'late' ? 2 : 1,
+      excusedCount: status === 'excused' ? 1 : 0,
+      halfDayCount: 0,
+      attendanceRate: '93',
+      absenteeRate: '7',
+    },
+    excusedBy: opts.isExcused ? 'Prof. Anderson' : null,
+  };
+}
+
 export const mockAttendance: AttendanceRecord[] = [
-  { date: '2024-10-03', status: 'present', sessionId: '1', checkInTime: '08:55', checkOutTime: '10:30', sessionTitle: 'Digital Design Fundamentals', instructor: 'Prof. Anderson', room: 'Room 302' },
-  { date: '2024-10-04', status: 'present', sessionId: '1', checkInTime: '08:58', checkOutTime: '10:30', sessionTitle: 'Digital Design Fundamentals', instructor: 'Prof. Anderson', room: 'Room 302' },
-  { date: '2024-10-05', status: 'absent', sessionId: '1', sessionTitle: 'Digital Design Fundamentals', instructor: 'Prof. Anderson', room: 'Room 302' },
-  { date: '2024-10-07', status: 'present', sessionId: '1', checkInTime: '08:50', checkOutTime: '10:30', sessionTitle: 'Digital Design Fundamentals', instructor: 'Prof. Anderson', room: 'Room 302' },
-  { date: '2024-10-08', status: 'present', sessionId: '1', checkInTime: '09:00', checkOutTime: '10:30', sessionTitle: 'Digital Design Fundamentals', instructor: 'Prof. Anderson', room: 'Room 302' },
-  { date: '2024-10-09', status: 'present', sessionId: '1', checkInTime: '08:57', checkOutTime: '10:28', sessionTitle: 'Digital Design Fundamentals', instructor: 'Prof. Anderson', room: 'Room 302' },
-  { date: '2024-10-10', status: 'present', sessionId: '1', checkInTime: '08:59', checkOutTime: '10:30', sessionTitle: 'Digital Design Fundamentals', instructor: 'Prof. Anderson', room: 'Room 302' },
-  { date: '2024-10-11', status: 'late', sessionId: '1', checkInTime: '09:25', checkOutTime: '10:30', lateTime: '25 minutes', sessionTitle: 'Digital Design Fundamentals', instructor: 'Prof. Anderson', room: 'Room 302' },
-  { date: '2024-10-12', status: 'present', sessionId: '1', checkInTime: '08:52', checkOutTime: '10:30', sessionTitle: 'Digital Design Fundamentals', instructor: 'Prof. Anderson', room: 'Room 302' },
-  { date: '2024-10-14', status: 'present', sessionId: '1', checkInTime: '08:56', checkOutTime: '10:30', sessionTitle: 'Digital Design Fundamentals', instructor: 'Prof. Anderson', room: 'Room 302' },
-  { date: '2024-10-16', status: 'excused', sessionId: '1', excuseNotes: 'Medical appointment — doctor\'s note submitted.', sessionTitle: 'Digital Design Fundamentals', instructor: 'Prof. Anderson', room: 'Room 302' },
-  { date: '2024-10-17', status: 'present', sessionId: '1', checkInTime: '08:58', checkOutTime: '10:30', sessionTitle: 'Digital Design Fundamentals', instructor: 'Prof. Anderson', room: 'Room 302' },
-  { date: '2024-10-18', status: 'present', sessionId: '1', checkInTime: '09:00', checkOutTime: '10:25', halfLeaveNotes: 'Left early for family emergency — approved by instructor.', sessionTitle: 'Digital Design Fundamentals', instructor: 'Prof. Anderson', room: 'Room 302' },
-  { date: '2024-10-19', status: 'absent', sessionId: '1', sessionTitle: 'Digital Design Fundamentals', instructor: 'Prof. Anderson', room: 'Room 302' },
-  { date: '2024-10-21', status: 'present', sessionId: '1', checkInTime: '08:55', checkOutTime: '10:30', sessionTitle: 'Digital Design Fundamentals', instructor: 'Prof. Anderson', room: 'Room 302' },
-  { date: '2024-10-22', status: 'present', sessionId: '1', checkInTime: '08:50', checkOutTime: '10:30', sessionTitle: 'Digital Design Fundamentals', instructor: 'Prof. Anderson', room: 'Room 302' },
-  { date: '2024-10-23', status: 'present', sessionId: '1', checkInTime: '08:58', checkOutTime: '10:30', sessionTitle: 'Digital Design Fundamentals', instructor: 'Prof. Anderson', room: 'Room 302' },
-  { date: '2024-10-24', status: 'present', sessionId: '1', checkInTime: '09:01', checkOutTime: '10:30', sessionTitle: 'Digital Design Fundamentals', instructor: 'Prof. Anderson', room: 'Room 302' },
-  { date: '2024-10-25', status: 'present', sessionId: '1', checkInTime: '08:53', checkOutTime: '10:30', sessionTitle: 'Digital Design Fundamentals', instructor: 'Prof. Anderson', room: 'Room 302' },
-  { date: '2024-10-26', status: 'present', sessionId: '1', checkInTime: '08:56', checkOutTime: '10:30', sessionTitle: 'Digital Design Fundamentals', instructor: 'Prof. Anderson', room: 'Room 302' },
-  { date: '2024-10-28', status: 'present', sessionId: '1', checkInTime: '08:59', checkOutTime: '10:30', sessionTitle: 'Digital Design Fundamentals', instructor: 'Prof. Anderson', room: 'Room 302' },
-  { date: '2024-10-29', status: 'present', sessionId: '1', checkInTime: '08:55', checkOutTime: '10:30', sessionTitle: 'Digital Design Fundamentals', instructor: 'Prof. Anderson', room: 'Room 302' },
-  { date: '2024-10-30', status: 'present', sessionId: '1', checkInTime: '09:00', checkOutTime: '10:30', sessionTitle: 'Digital Design Fundamentals', instructor: 'Prof. Anderson', room: 'Room 302' },
-  { date: '2024-10-31', status: 'present', sessionId: '1', checkInTime: '08:57', checkOutTime: '10:30', sessionTitle: 'Digital Design Fundamentals', instructor: 'Prof. Anderson', room: 'Room 302' },
+  makeAttendance('a1', 'present', '2024-10-03', '09:00', '10:30', 'Color Theory & Accessibility', 'Room 1', 'R-302', 'Design Block', { checkInTime: '08:55', checkOutTime: '10:30' }),
+  makeAttendance('a2', 'present', '2024-10-04', '09:00', '10:30', 'Typography Fundamentals', 'Room 1', 'R-302', 'Design Block', { checkInTime: '08:58', checkOutTime: '10:30' }),
+  makeAttendance('a3', 'absent', '2024-10-05', '09:00', '10:30', 'Layout Systems', 'Room 1', 'R-302', 'Design Block', { notes: 'Student did not attend, no reason provided.' }),
+  makeAttendance('a4', 'present', '2024-10-07', '09:00', '10:30', 'Visual Hierarchy', 'Room 2', 'R-201', 'Science Block', { checkInTime: '08:50', checkOutTime: '10:30' }),
+  makeAttendance('a5', 'present', '2024-10-08', '10:00', '11:30', 'Component Design', 'Room 2', 'R-201', 'Science Block', { checkInTime: '09:58', checkOutTime: '11:30' }),
+  makeAttendance('a6', 'present', '2024-10-09', '10:00', '11:30', 'Design Systems', 'Room 3', 'R-305', 'Engineering Block', { checkInTime: '09:57', checkOutTime: '11:28' }),
+  makeAttendance('a7', 'present', '2024-10-10', '09:00', '10:30', 'Prototyping', 'Room 1', 'R-302', 'Design Block', { checkInTime: '08:59', checkOutTime: '10:30' }),
+  makeAttendance('a8', 'late', '2024-10-11', '09:00', '10:30', 'User Testing Methods', 'Room 1', 'R-302', 'Design Block', { checkInTime: '09:25', checkOutTime: '10:30', minutesLate: 25, notes: 'Traffic delay reported by student.' }),
+  makeAttendance('a9', 'present', '2024-10-12', '09:00', '10:30', 'Responsive Design', 'Room 4', 'R-108', 'Main Building', { checkInTime: '08:52', checkOutTime: '10:30' }),
+  makeAttendance('a10', 'present', '2024-10-14', '09:00', '10:30', 'Accessibility Standards', 'Room 1', 'R-302', 'Design Block', { checkInTime: '08:56', checkOutTime: '10:30' }),
+  makeAttendance('a11', 'excused', '2024-10-16', '09:00', '10:30', 'Design Review', 'Room 1', 'R-302', 'Design Block', { isExcused: true, excuseReason: 'Medical appointment — doctor\'s note submitted.' }),
+  makeAttendance('a12', 'present', '2024-10-17', '10:00', '11:30', 'Wireframing', 'Room 2', 'R-201', 'Science Block', { checkInTime: '09:58', checkOutTime: '11:30' }),
+  makeAttendance('a13', 'present', '2024-10-18', '09:00', '10:30', 'Interaction Patterns', 'Room 1', 'R-302', 'Design Block', { checkInTime: '09:00', checkOutTime: '10:00', notes: 'Left early for family emergency — approved by instructor (half-day).' }),
+  makeAttendance('a14', 'absent', '2024-10-19', '09:00', '10:30', 'Motion Design', 'Room 1', 'R-302', 'Design Block'),
+  makeAttendance('a15', 'present', '2024-10-21', '09:00', '10:30', 'Design Critique', 'Room 3', 'R-305', 'Engineering Block', { checkInTime: '08:55', checkOutTime: '10:30' }),
+  makeAttendance('a16', 'present', '2024-10-22', '10:00', '11:30', 'Design Handoff', 'Room 2', 'R-201', 'Science Block', { checkInTime: '09:50', checkOutTime: '11:30' }),
+  makeAttendance('a17', 'present', '2024-10-23', '09:00', '10:30', 'Final Review Prep', 'Room 1', 'R-302', 'Design Block', { checkInTime: '08:58', checkOutTime: '10:30' }),
+  makeAttendance('a18', 'late', '2024-10-24', '09:00', '10:30', 'Portfolio Workshop', 'Room 1', 'R-302', 'Design Block', { checkInTime: '09:12', checkOutTime: '10:30', minutesLate: 12, notes: 'Bus delay.' }),
+  makeAttendance('a19', 'present', '2024-10-25', '10:00', '11:30', 'Advanced Prototyping', 'Room 4', 'R-108', 'Main Building', { checkInTime: '09:53', checkOutTime: '11:30' }),
+  makeAttendance('a20', 'present', '2024-10-26', '09:00', '10:30', 'Usability Heuristics', 'Room 1', 'R-302', 'Design Block', { checkInTime: '08:56', checkOutTime: '10:30' }),
+  makeAttendance('a21', 'present', '2024-10-28', '09:00', '10:30', 'Design Ops', 'Room 2', 'R-201', 'Science Block', { checkInTime: '08:59', checkOutTime: '10:30' }),
+  makeAttendance('a22', 'excused', '2024-10-29', '09:00', '10:30', 'Sprint Review', 'Room 1', 'R-302', 'Design Block', { isExcused: true, excuseReason: 'University event — official permission granted.' }),
+  makeAttendance('a23', 'present', '2024-10-30', '10:00', '11:30', 'Design Thinking', 'Room 3', 'R-305', 'Engineering Block', { checkInTime: '10:00', checkOutTime: '11:30' }),
+  makeAttendance('a24', 'present', '2024-10-31', '09:00', '10:30', 'Final Presentations', 'Room 1', 'R-302', 'Design Block', { checkInTime: '08:57', checkOutTime: '10:30' }),
 ];
 
 export const modules = ['Design', 'Engineering', 'Mathematics', 'Physics', 'Research'];

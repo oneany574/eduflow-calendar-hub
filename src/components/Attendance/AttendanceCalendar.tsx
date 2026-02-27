@@ -16,6 +16,11 @@ const statusStyle: Record<AttendanceStatus, { letter: string; className: string 
   excused: { letter: 'E', className: 'attendance-excused border' },
 };
 
+// Helper to extract YYYY-MM-DD from classSession.sessionDate
+function getSessionDate(record: AttendanceRecord): string {
+  return format(new Date(record.classSession.sessionDate), 'yyyy-MM-dd');
+}
+
 export function AttendanceCalendar() {
   const [currentDate, setCurrentDate] = useState(new Date(2024, 9, 1));
   const [statusFilter, setStatusFilter] = useState('all');
@@ -30,10 +35,11 @@ export function AttendanceCalendar() {
   }, [currentDate]);
 
   const attendanceMap = useMemo(() => {
-    const map = new Map<string, AttendanceStatus>();
+    const map = new Map<string, AttendanceRecord>();
     mockAttendance.forEach((a) => {
+      const dateStr = getSessionDate(a);
       if (statusFilter === 'all' || a.status === statusFilter) {
-        map.set(a.date, a.status);
+        map.set(dateStr, a);
       }
     });
     return map;
@@ -115,7 +121,8 @@ export function AttendanceCalendar() {
         <div className="grid grid-cols-7">
           {days.map((day, i) => {
             const dateStr = format(day, 'yyyy-MM-dd');
-            const status = attendanceMap.get(dateStr);
+            const record = attendanceMap.get(dateStr);
+            const status = record?.status;
             const inMonth = isSameMonth(day, currentDate);
             const today = isSameDay(day, todayMock);
 
@@ -124,9 +131,8 @@ export function AttendanceCalendar() {
                 key={i}
                 onClick={() => {
                   if (inMonth) {
-                    const rec = mockAttendance.find(a => a.date === dateStr) || null;
                     setSelectedDay(day);
-                    setSelectedRecord(rec);
+                    setSelectedRecord(record || null);
                   }
                 }}
                 className={`
