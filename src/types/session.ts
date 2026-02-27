@@ -22,18 +22,61 @@ export interface Session {
   resources?: { name: string; url: string }[];
 }
 
+export interface Classroom {
+  id: string;
+  name: string;
+  roomNumber: string;
+  building: string;
+}
+
+export interface ClassSchedule {
+  id: string;
+  scheduleType: string;
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+}
+
+export interface ClassSession {
+  id: string;
+  sessionDate: string;
+  startTime: string;
+  endTime: string;
+  status: string;
+  topic: string;
+  description: string;
+  classroom: Classroom;
+  classSchedule: ClassSchedule;
+}
+
+export interface SessionAttendanceOverview {
+  id: string;
+  status: string;
+  totalStudents: number;
+  presentCount: number;
+  absentCount: number;
+  lateCount: number;
+  excusedCount: number;
+  halfDayCount: number;
+  attendanceRate: string;
+  absenteeRate: string;
+}
+
 export interface AttendanceRecord {
-  date: string;
+  id: string;
   status: AttendanceStatus;
-  sessionId: string;
-  checkInTime?: string;
-  checkOutTime?: string;
-  lateTime?: string;
-  excuseNotes?: string;
-  halfLeaveNotes?: string;
-  sessionTitle?: string;
-  instructor?: string;
-  room?: string;
+  checkInTime: string | null;
+  checkOutTime: string | null;
+  minutesLate: number;
+  isExcused: boolean;
+  excuseReason: string | null;
+  excuseProof: string | null;
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
+  classSession: ClassSession;
+  sessionAttendanceOverview: SessionAttendanceOverview;
+  excusedBy: string | null;
 }
 
 export interface FilterState {
